@@ -1,8 +1,10 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Header from "./Header";
+import validate from "../utils/validate";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fullName = useRef<HTMLInputElement>(null);
   const email = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
@@ -12,10 +14,12 @@ const Login = () => {
   };
 
   const handleSignIn = () => {
-    console.log("Sign in clicked");
-    console.log("Full Name:", fullName.current?.value);
-    console.log("Email:", email.current?.value);
-    console.log("Password:", password.current?.value);
+    const error = validate(
+      email.current?.value || "",
+      password.current?.value || "",
+      !isSignInForm ? fullName.current?.value || "" : undefined,
+    );
+    setErrorMessage(error);
   };
 
   return (
@@ -61,6 +65,9 @@ const Login = () => {
           {isSignInForm ? "Sign In" : "Sign Up"}
           <span className="ml-2">→</span>
         </button>
+        {errorMessage && (
+          <p className="text-red-500 text-sm my-2">{errorMessage}</p>
+        )}
         <p
           className="text-white text-sm my-2 cursor-pointer"
           onClick={toggleSignInForm}

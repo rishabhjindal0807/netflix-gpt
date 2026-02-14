@@ -25,3 +25,5 @@
   - Search Bar
   - Movie Suggestions
     # netflix-gpt
+
+# firebase deploy --only hosting:netflixgpt-rj0807
