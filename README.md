@@ -7,6 +7,7 @@
 - Framer motion
 - Firebase
 - Tailwind CSS
+- Header Component
 
 
 # Features
