@@ -1,13 +1,25 @@
 import { useRef, useState } from "react";
 import Header from "./Header";
 import validate from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+import { useNavigate } from "react-router-dom";
+import { addUser } from "../utils/userSlice";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const fullName = useRef<HTMLInputElement>(null);
   const email = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
@@ -20,6 +32,74 @@ const Login = () => {
       !isSignInForm ? fullName.current?.value || "" : undefined,
     );
     setErrorMessage(error);
+    if (error) return;
+
+    setIsLoading(true);
+    if (isSignInForm) {
+      // Sign in logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current?.value || "",
+        password.current?.value || "",
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          navigate("/browse");
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          setErrorMessage(errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      // Sign up logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current?.value || "",
+        password.current?.value || "",
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: fullName.current?.value || "",
+            photoURL: "",
+          })
+            .then(() => {
+              // Profile updated!
+              // ...
+              console.log(user);
+              const { uid, email, displayName } = auth.currentUser!;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                }),
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              // An error occurred
+              console.error("Update profile error:", error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          const errorMessage = error.message;
+          setErrorMessage(errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   };
 
   return (
@@ -59,11 +139,21 @@ const Login = () => {
           ref={password}
         />
         <button
-          className="p-2 my-4 bg-red-700 text-white rounded w-full"
+          className="p-2 my-4 bg-red-700 text-white rounded w-full flex items-center justify-center"
           onClick={handleSignIn}
+          disabled={isLoading}
         >
-          {isSignInForm ? "Sign In" : "Sign Up"}
-          <span className="ml-2">→</span>
+          {isLoading ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              Loading...
+            </div>
+          ) : (
+            <>
+              {isSignInForm ? "Sign In" : "Sign Up"}
+              <span className="ml-2">→</span>
+            </>
+          )}
         </button>
         {errorMessage && (
           <p className="text-red-500 text-sm my-2">{errorMessage}</p>

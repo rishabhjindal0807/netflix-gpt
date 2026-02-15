@@ -8,6 +8,12 @@
 - Firebase
 - Tailwind CSS
 - Header Component
+- Firebase Setup
+- Deploy app to production - https://netflixgpt-rj0807.web.app/
+- Create SignUp and Sign In
+- Implement Sign In and Sign Up API
+- Create Redux store with User slice
+
 
 
 # Features
