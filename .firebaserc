@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "netflixgpt-fa2d8"
-  }
+  },
+  "targets": {
+    "netflixgpt-fa2d8": {
+      "hosting": {
+        "netflixgpt-rj0807": [
+          "netflixgpt-rj0807"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

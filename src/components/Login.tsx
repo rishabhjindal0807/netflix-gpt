@@ -18,7 +18,6 @@ const Login = () => {
   const fullName = useRef<HTMLInputElement>(null);
   const email = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const toggleSignInForm = () => {
@@ -44,9 +43,6 @@ const Login = () => {
       )
         .then((userCredential) => {
           // Signed in
-          const user = userCredential.user;
-          console.log(user);
-          navigate("/browse");
           // ...
         })
         .catch((error) => {
@@ -84,7 +80,6 @@ const Login = () => {
                   displayName: displayName,
                 }),
               );
-              navigate("/browse");
             })
             .catch((error) => {
               // An error occurred
